@@ -1,2 +1,5 @@
-# VSCode WorkSpace
-*.code-workspace
+# Nvim Lock
+lazy-lock.json
+
+# MacOS
+.DS_Store
