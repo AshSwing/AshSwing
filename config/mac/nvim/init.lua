@@ -19,12 +19,13 @@ vim.opt.rtp:prepend(lazypath)
 -- Core Setting --
 require("core.init")
 
--- Theme & Plugin
+-- Plugin Setting --
 require("lazy").setup({
+    -- Theme
     require("theme.tokyonight"),
-    require("plugin.which-key"),
-    --require("plugin.nvim-tree"),
-    require("plugin.neo-tree"),
-    require("plugin.lualine"),
-    require("plugin.bufferline"),
+    -- IDE Config
+    require("setup.usable"), -- 易用设置
+    require("setup.layout"), -- 界面布局
+    -- require("setup.coding"), -- 编码工具
+    require("setup.finder"), -- 项目管理
 })
