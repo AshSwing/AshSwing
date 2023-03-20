@@ -10,8 +10,8 @@ ln -sfn ~/AshSwing/config/mac/kitty ~/.config/kitty
 ln -sf ~/AshSwing/config/mac/starship.toml ~/.config/starship.toml
 
 # NeoVim
-rm -rf ~/.config/nvim
-ln -sfn ~/AshSwing/config/mac/nvim ~/.config/nvim
+rm -rf ~/.config/nvim/lua/user
+ln -sfn ~/AshSwing/config/mac/nvim ~/.config/nvim/lua/user
 
 # Conda
 ln -sf ~/AshSwing/config/mac/condarc ~/.condarc
