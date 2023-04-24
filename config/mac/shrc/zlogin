@@ -1,0 +1,15 @@
+# >>> Prompt Setting >>>
+[[ $TERM == "xterm-kitty" ]] && eval "$(starship init zsh)"
+# <<< Prompt Setting <<<
+
+# >>> Kitty Setting >>>
+[[ $TERM == "xterm-kitty" ]] && alias ssh="kitty +kitten ssh"
+# <<< Kitty Setting <<<
+
+# >>> FNM Setting >>>
+(( $+commands[fnm]  )) && eval "$(fnm env --use-on-cd)"
+# <<< FNM Setting <<<
+
+# >>> Python Setting >>>
+export PYTHONDONTWRITEBYTECODE=1
+# <<< Python Setting >>>
