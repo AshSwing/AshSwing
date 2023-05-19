@@ -27,4 +27,12 @@ return {
     -- setting a mapping to false will disable it
     -- ["<esc>"] = false,
   },
+  i = {
+    ["<C-h>"] = { "<Left>", desc = "Move left in editing" },
+    ["<C-l>"] = { "<Right>", desc = "Move right in editing"},
+    ["<C-j>"] = { "<Down>", desc = "Move down in editing"},
+    ["<C-k>"] = { "<Up>", desc = "Move up in editing"},
+    
+
+  } 
 }
