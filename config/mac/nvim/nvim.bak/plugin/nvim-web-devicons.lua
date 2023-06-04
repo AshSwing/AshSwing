@@ -7,7 +7,7 @@ return {
             color = true,
             override_by_extension = {
                 ["md"] = {
-                    icon = "",
+                    icon = "",
                     color = "#42a5f5",
                     cterm_color = "75",
                     name = "Markdown"
