@@ -2,6 +2,13 @@ return {
   {
     "nvim-tree/nvim-web-devicons",
     opts = {
+      override_by_extension = {
+        ["ipynb"] = { icon = "󱓵", name = "Notebook", color = "#339933" },
+        ["md"] = { icon = "", name = "Markdown", color = "#6666FF" },
+      },
+      override_by_filename = {
+        ["README.md"] = { icon = "", name = "Readme", color = "#6666FF" },
+      },
       deb = { icon = "", name = "Deb" },
       lock = { icon = "", name = "Lock" },
       mp3 = { icon = "󰝚", name = "Mp3" },
@@ -14,6 +21,7 @@ return {
       woff2 = { icon = "", name = "WebOpenFontFormat2" },
       xz = { icon = "", name = "Xz" },
       zip = { icon = "", name = "Zip" },
+      ipynb = { icon = "󱓵", name = "Notebook" },
     },
   },
   {
@@ -61,4 +69,3 @@ return {
     config = require "plugins.configs.lspkind",
   },
 }
-
