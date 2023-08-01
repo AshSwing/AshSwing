@@ -8,6 +8,7 @@ return {
       },
       override_by_filename = {
         ["README.md"] = { icon = "", name = "Readme", color = "#6666FF" },
+        ["package.json"] = { icon = "󰎙", name = "NodePackage", color = "#339933" },
       },
       deb = { icon = "", name = "Deb" },
       lock = { icon = "", name = "Lock" },
