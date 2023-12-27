@@ -1,0 +1,99 @@
+PLUGIN_DIR="$CONFIG_DIR/plugins"
+ITEM_DIR="$CONFIG_DIR/items"
+
+bar=(
+  height=30
+  color=0x651e1e2e
+  blur_radius=20
+  padding_left=10
+  padding_right=10
+  y_offset=6
+  margin=6
+  topmost=window
+  corner_radius=20
+  border_width=1
+  border_color=0x28222222
+  shadow.color=0x28000000
+  shadow.angle=0
+)
+
+sketchybar --bar "${bar[@]}"
+
+defaults=(
+  updates=when_shown
+  icon.font="Symbols Nerd Font Mono:Normal:14.0"
+  icon.color=0xffffffff
+  icon.padding_left=4
+  icon.padding_right=4
+  label.font="Hiragino Sans GB:Bold:14.0"
+  label.color=0xffffffff
+  label.padding_left=4
+  label.padding_right=4
+  padding_left=5
+  padding_right=5
+  background.height=26
+  background.corner_radius=9
+  background.border_width=2
+  popup.background.border_width=2
+  popup.background.corner_radius=9
+  popup.background.border_color=0xffcad3f5
+  popup.background.color=0xff181926
+  popup.blur_radius=20
+  popup.background.shadow.drawing=on
+  scroll_texts=on
+  
+)
+
+sketchybar --default "${defaults[@]}"
+
+sketchybar --add item os left                                      \
+           --set os icon=                                         \
+                    icon.color=0xfff5c2e7                          \
+                    icon.font.size=16                              \
+                    icon.y_offset=1                                \
+                    icon.padding_left=0                            \
+                    icon.padding_right=0                           \
+                    label.padding_left=0                           \
+                    label.padding_right=6                          \
+                    background.drawing=off
+
+
+SPACE_ICONS=("󰇧" "" "" "4" "5" "6" "7" "8" "9" "10")
+
+for i in "${!SPACE_ICONS[@]}"
+do
+  sid=$(($i+1))
+  sketchybar --add space space.$sid left                                 \
+             --set space.$sid space=$sid                                 \
+                              icon=${SPACE_ICONS[i]}                     \
+                              icon.y_offset=1                            \
+                              background.color=0x44ffffff                \
+                              background.corner_radius=5                 \
+                              background.height=20                       \
+                              background.drawing=off                     \
+                              label.drawing=off                          \
+                              script="$PLUGIN_DIR/space.sh"              \
+                              click_script="yabai -m space --focus $sid"
+done
+
+sketchybar --add item front_app center                               \
+           --set front_app       script="$PLUGIN_DIR/front_app.sh" \
+                                 icon.drawing=off                  \
+           --subscribe front_app front_app_switched
+
+sketchybar --add item clock right                              \
+           --set clock   update_freq=10                        \
+                         icon=                                \
+                         icon.y_offset=1                       \
+                         script="$PLUGIN_DIR/clock.sh"         \
+                                                               \
+           --add item battery right                            \
+           --set battery script="$PLUGIN_DIR/battery.sh"       \
+                         update_freq=120                       \
+           --subscribe battery system_woke power_source_change
+
+
+# Auto-reload
+sketchybar --hotload on
+sketchybar --update
+
