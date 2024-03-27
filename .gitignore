@@ -3,3 +3,9 @@ lazy-lock.json
 
 # MacOS
 .DS_Store
+
+# Emacs
+elpa/
+auto-save-list/
+tree-sitter/
+custom.el

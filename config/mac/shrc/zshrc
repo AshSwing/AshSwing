@@ -22,3 +22,6 @@ export SDKMAN_DIR="$HOME/.sdkman"
 
 # CodeWhisperer post block. Keep at the bottom of this file.
 [[ -f "${HOME}/Library/Application Support/codewhisperer/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/codewhisperer/shell/zshrc.post.zsh"
+
+# Created by `pipx` on 2024-03-27 13:52:32
+export PATH="$PATH:/Users/ashswing/.local/bin"
