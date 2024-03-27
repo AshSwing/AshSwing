@@ -16,3 +16,6 @@ ln -sfn ~/AshSwing/config/mac/nvim ~/.config/nvim/lua/user
 # Conda
 ln -sf ~/AshSwing/config/mac/condarc ~/.condarc
 
+# Emacs
+rm -rf ~/.config/emacs
+ln -sfn ~/AshSwing/config/mac/emacs ~/.config/emacs
