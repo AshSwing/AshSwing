@@ -1,1 +1,5 @@
 # gitignore for config
+
+# emaconf compiled config
+emaconf.elc
+emaconf.el
