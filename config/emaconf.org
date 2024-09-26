@@ -1,0 +1,85 @@
+#+TITLE: AshSwing's Emacs Config
+#+CREATED: [2024-09-26 Fri 23:13]
+#+LAST_MODIFIED: [2024-09-26 Fri 23:13]
+
+* AshSwing's Emacs Config
+
+org-babel 增强了 org-mode 中的代码块功能, 其中一个功能就是提取 =.org= 文件中所有的代码块, 所以只要把配置文件写在 =.org= 文件中的代码块中, 然后在 =init.el= 中加载这些代码, 就可以实现利用 org-mode 管理 emacs 配置. org-babel 专门提供了一个专门的 =org-babel-load-file=, 可以实现提取 =org= 文件中的代码块并加载, 需要额外做的只有在 =~/.emacs.d/init.el= 中添加如下内容:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+(org-babel-load-file (expand-file-name "~/AshSwing/config/emaconf.org") 1)
+#+END_SRC
+
+默认所有的 =emacs-lisp= 代码块都会被加载, 但可以通过设置 =:tangle= 参数来控制是否加载, 可选参数 =COMPILE= 标识是否编译代码块.
+
+** 基础配置
+
+emacs 作为一款历史悠久的计算机软件, 其内包含了许多历史遗留问题, 需要通过配置文件进行调整, 才能做到开箱即用.
+
+首先在配置文件开头需要声明一个局部变量 =lexical-binding=, 告诉 elisp 编译器, 接下来的代码都是词法作用域, 否则 emacs 会默认使用动态作用域.
+
+#+BEGIN_SRC emacs-lisp
+
+  ;;; -*- lexical-binding: t; -*-
+
+#+END_SRC
+
+接下来配置一些全局变量, 包括系统标识和字体.
+
+#+BEGIN_SRC emacs-lisp
+
+  (defconst *is-mac* (eq system-type 'darwin))
+  (defconst *is-win* (eq system-type 'windows-nt))
+  (defconst *mono-font-family* "LXGW WenKai Mono")
+  (defconst *mono-font-height* 150)
+  (defconst *serif-font-family* "LXGW WenKai")
+  (defconst *serif-font-height* 140)
+
+#+END_SRC
+
+*** 基础界面设置
+
+关闭一些无用的 UI 组件, 调整默认字体, 优化默认显示.
+
+#+BEGIN_SRC emacs-lisp
+
+  (tool-bar-mode 0)
+  (scroll-bar-mode 0)
+  (menu-bar-mode 0)
+  (global-hl-line-mode t)
+  (column-number-mode t)
+  (display-line-numbers-mode t)
+  (pixel-scroll-precision-mode 1)
+  (setq-default inhibit-startup-screen t
+		inhibit-startup-echo-area-message t
+		initial-scratch-message nil
+		visible-bell nil
+		ring-bell-function 'ignore
+		scroll-preserve-screen-position 1
+		mouse-wheel-follow-mouse t
+		pixel-scroll-precision-use-momentum t
+		line-spacing 0.2
+		left-margin-width 2
+		right-margin-width 2
+		cursor-type 'bar
+		display-line-numbers-type 'relative)
+  
+  (set-face-attribute 'default nil :family *mono-font-family* :height *mono-font-height*)
+
+#+END_SRC
+
+*** 基础行为配置
+
+emacs 默认会在使用中产生许多多余的副产物, 例如备份文件, 实际上完全不需要. 此外, 还要打开一些更符合现代直觉的功能, 例如自动加载磁盘文件修改, 选取编辑自动覆盖等等.
+
+#+BEGIN_SRC emacs-lisp
+
+  (global-auto-revert-mode t)
+  (delete-selection-mode t)
+  (setq-default custom-file (locate-user-emacs-file "custom.el")
+		confirm-kill-emacs #'yes-or-no-p
+		make-backup-files nil)
+
+#+END_SRC
+
+至此 emacs 处于基本能用的状态.
