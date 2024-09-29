@@ -1,13 +1,13 @@
 #+TITLE: AshSwing's Emacs Config
-#+CREATED: [2024-09-26 Fri 23:13]
-#+LAST_MODIFIED: [2024-09-26 Fri 23:13]
+#+CREATED: [2024-09-26 Thu 23:13]
+#+LAST_MODIFIED: [2024-09-27 Fri 22:54]
 
 * AshSwing's Emacs Config
 
 org-babel 增强了 org-mode 中的代码块功能, 其中一个功能就是提取 =.org= 文件中所有的代码块, 所以只要把配置文件写在 =.org= 文件中的代码块中, 然后在 =init.el= 中加载这些代码, 就可以实现利用 org-mode 管理 emacs 配置. org-babel 专门提供了一个专门的 =org-babel-load-file=, 可以实现提取 =org= 文件中的代码块并加载, 需要额外做的只有在 =~/.emacs.d/init.el= 中添加如下内容:
 
 #+BEGIN_SRC emacs-lisp :tangle no
-(org-babel-load-file (expand-file-name "~/AshSwing/config/emaconf.org") 1)
+(org-babel-load-file (expand-file-name "~/AshSwing/config/emaconf.org"))
 #+END_SRC
 
 默认所有的 =emacs-lisp= 代码块都会被加载, 但可以通过设置 =:tangle= 参数来控制是否加载, 可选参数 =COMPILE= 标识是否编译代码块.
@@ -20,7 +20,13 @@ emacs 作为一款历史悠久的计算机软件, 其内包含了许多历史遗
 
 #+BEGIN_SRC emacs-lisp
 
-  ;;; -*- lexical-binding: t; -*-
+  ;;; emaconf.el --- Load the full configuration -*- lexical-binding: t -*-
+  ;;; Commentary:
+
+  ;; This file bootstraps the configuration, which is divided into
+  ;; a number of other files.
+
+  ;;; Code:
 
 #+END_SRC
 
@@ -68,6 +74,22 @@ emacs 作为一款历史悠久的计算机软件, 其内包含了许多历史遗
 
 #+END_SRC
 
+参考 [[https://github.com/minad/org-modern][org-modern]] 对基础 UI 界面进行配置.
+
+#+BEGIN_SRC emacs-lisp
+  
+  (modify-all-frames-parameters
+   '((right-divider-width . 20)
+     (internal-border-width . 20)))
+  (dolist (face '(window-divider
+                  window-divider-first-pixel
+                  window-divider-last-pixel))
+    (face-spec-reset-face face)
+    (set-face-foreground face (face-attribute 'default :background)))
+  (set-face-background 'fringe (face-attribute 'default :background))
+
+#+END_SRC
+
 *** 基础行为配置
 
 emacs 默认会在使用中产生许多多余的副产物, 例如备份文件, 实际上完全不需要. 此外, 还要打开一些更符合现代直觉的功能, 例如自动加载磁盘文件修改, 选取编辑自动覆盖等等.
@@ -82,4 +104,299 @@ emacs 默认会在使用中产生许多多余的副产物, 例如备份文件, �
 
 #+END_SRC
 
-至此 emacs 处于基本能用的状态.
+至此 =emacs= 处于基本能用的状态.
+
+*** 基础编辑配置
+
+基本的编辑能力配置, 首先配置代码模式 =prog-mode=.
+
+#+BEGIN_SRC emacs-lisp
+
+  (add-hook 'prog-mode-hook 'electric-pair-mode)
+  (add-hook 'prog-mode-hook 'show-paren-mode)
+  (add-hook 'prog-mode-hook 'column-number-mode) ; 在ModeLine显示列号
+  (add-hook 'prog-mode-hook 'flymake-mode) ;错误的提示
+  (add-hook 'prog-mode-hook 'hs-minor-mode) ;代码的折叠
+  (add-hook 'prog-mode-hook 'prettify-symbols-mode) ;会将lambda等符号美化为λ
+
+  (add-hook 'prog-mode-hook
+      (lambda ()
+        (defvar display-line-numbers-type)
+        (display-line-numbers-mode 1) ; 显示行号
+        (setq display-line-numbers-type 'relative)))
+
+#+END_SRC
+
+然后是 =org-mode=.
+
+#+BEGIN_SRC emacs-lisp
+
+  (add-hook 'org-mode-hook 'electric-pair-mode)
+  (add-hook 'org-mode-hook 'show-paren-mode)
+  (add-hook 'org-mode-hook
+  	    (lambda ()
+      (defvar truncate-lines)
+      (setq truncate-lines nil)))
+
+#+END_SRC
+
+同样参考 =org-modern=, 对 =org-mode= 进行配置.
+
+#+BEGIN_SRC emacs-lisp
+  (setq
+   ;; Edit settings
+   org-auto-align-tags nil
+   org-tags-column 0
+   org-catch-invisible-edits 'show-and-error
+   org-special-ctrl-a/e t
+   org-insert-heading-respect-content t
+
+   ;; Org styling, hide markup etc.
+   org-hide-emphasis-markers t
+   org-pretty-entities t
+
+   ;; Agenda styling
+   org-agenda-tags-column 0
+   org-agenda-block-separator ?─
+   org-agenda-time-grid
+   '((daily today require-timed)
+     (800 1000 1200 1400 1600 1800 2000)
+     " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+   org-agenda-current-time-string
+   "◀── now ─────────────────────────────────────────────────")
+
+  ;; Ellipsis styling
+  (setq org-ellipsis "…")
+  (set-face-attribute 'org-ellipsis nil :inherit 'default :box nil)
+  
+#+END_SRC
+
+至此 =emacs= 处于开箱即用的状态, 默认的 UI 界面还算简洁美观, 编辑体验上起码不输 Notepad++ 之流.
+
+** 能力扩展
+
+开源编辑器最大的优势是社区, Emacs 作为一款年龄超过 40 年的程序, 社区开发者贡献了大量的插件, 并且很多仍然在积极开发, 这一部分也是 Emacs 配置的核心内容, 可以大致分为以下几块:
+
+- 包管理器和插件源配置
+- 核心功能增强插件
+- 界面美化插件
+- 编程增强插件
+
+*** 包管理和插件源配置
+
+除了默认的 GNU ELPA, 目前 Emacs 最大的插件仓库就是 MELPA, 将 MELPA 加载到 =package-archives= 列表中.
+
+#+BEGIN_SRC emacs-lisp
+
+  (require 'package)
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+  (package-initialize)
+  
+#+END_SRC
+
+*** 核心功能增强插件
+
+首先安装 =which-key=, 用于快捷键提示, 目前该包已经是 =emacs 30= 中的内置包.
+
+#+BEGIN_SRC emacs-lisp
+
+  (use-package which-key
+    :ensure t
+    :defer t
+    :hook (after-init . which-key-mode))
+
+#+END_SRC
+
+*** 界面美化插件
+
+界面应该是编辑器最不重要的功能, 但一定是配置文件最重要的内容.
+
+#+BEGIN_SRC emacs-lisp
+
+  ;; nerd icon support
+  (use-package nerd-icons
+    :ensure t
+    :custom (nerd-icons-font-family "Symbols Nerd Font Mono"))
+
+  ;; theme
+  (use-package doom-themes
+    :ensure t
+    :config
+    ;; Global settings (defaults)
+    (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+          doom-themes-enable-italic t) ; if nil, italics is universally disabled
+    (load-theme 'doom-shades-of-purple t)
+
+    ;; Enable flashing mode-line on errors
+    (doom-themes-visual-bell-config)
+    ;; Enhance doom theme for org
+    (doom-themes-org-config)
+    ;; TODO: doom for dired / treemacs / ?
+    )
+
+  ;; modeline
+  (use-package doom-modeline
+    :ensure t
+    :hook (after-init . doom-modeline-mode))
+
+  ;; dashboard
+
+  (use-package dashboard
+    :ensure t
+    :config
+    (dashboard-setup-startup-hook)
+    (add-to-list 'dashboard-items '(agenda) t)
+    (setq dashboard-center-content t
+  	dashboard-vertically-center-content t
+  	dashboard-display-icons-p t
+  	dashboard-icon-type 'nerd-icons
+  	;; dashboard-set-heading-icons t
+  	dashboard-set-file-icons t
+  	dashboard-week-agenda t))
+
+#+END_SRC
+
+除了编辑器本身的 UI 样式以外, 还有专门针对 =org-mode= 优化的 =modern-org-mode= 插件.
+
+#+BEGIN_SRC emacs-lisp
+  
+  (use-package org-modern
+    :ensure t
+    :config
+    (with-eval-after-load 'org (global-org-modern-mode)))
+
+#+END_SRC
+
+*** 编辑增强插件
+
+为了使 =emacs= 成为一个全能 IDE, 需要对其编辑能力进行优化.
+
+首先为 =emacs= 增加自动补全能力, 包括命令行补全, 即 =minibuffer= 内补全和输入补全, 即 =buffer= 内补全.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package vertico
+    :ensure t
+    :custom
+    ;; (vertico-scroll-margin 0) ;; Different scroll margin
+    (vertico-count 8) ;; Show more candidates
+    (vertico-resize t) ;; Grow and shrink the Vertico minibuffer
+    (vertico-cycle t) ;; Enable cycling for `vertico-next/previous'
+    :init
+    (vertico-mode))
+
+  (use-package corfu
+    :ensure t
+    ;; Optional customizations
+    :custom
+    (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+    (corfu-auto t)                 ;; Enable auto completion
+    ;; (corfu-separator ?\s)          ;; Orderless field separator
+    ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+    ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+    ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+    ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
+    ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+    ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+
+    ;; Enable Corfu only for certain modes. See also `global-corfu-modes'.
+    ;; :hook ((prog-mode . corfu-mode)
+    ;;        (shell-mode . corfu-mode)
+    ;;        (eshell-mode . corfu-mode))
+
+    ;; Recommended: Enable Corfu globally.  This is recommended since Dabbrev can
+    ;; be used globally (M-/).  See also the customization variable
+    ;; `global-corfu-modes' to exclude certain modes.
+    :init
+    (global-corfu-mode))
+
+  (use-package nerd-icons-corfu
+    :ensure t)
+  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter)
+
+#+END_SRC
+
+=vertico= 和 =corfu= 是补全前端, 还需要后端配合.
+
+#+BEGIN_SRC emacs-lisp
+    (use-package cape
+      :ensure t
+    ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
+    ;; Press C-c p ? to for help.
+    :bind ("C-c p" . cape-prefix-map) ;; Alternative keys: M-p, M-+, ...
+    ;; Alternatively bind Cape commands individually.
+    ;; :bind (("C-c p d" . cape-dabbrev)
+    ;;        ("C-c p h" . cape-history)
+    ;;        ("C-c p f" . cape-file)
+    ;;        ...)
+    :init
+    ;; Add to the global default value of `completion-at-point-functions' which is
+    ;; used by `completion-at-point'.  The order of the functions matters, the
+    ;; first function returning a result wins.  Note that the list of buffer-local
+    ;; completion functions takes precedence over the global list.
+    (add-hook 'completion-at-point-functions #'cape-dabbrev)
+    (add-hook 'completion-at-point-functions #'cape-file)
+    (add-hook 'completion-at-point-functions #'cape-elisp-block)
+    (add-hook 'completion-at-point-functions #'cape-elisp-symbol)
+    (add-hook 'completion-at-point-functions #'cape-keyword)
+    (add-hook 'completion-at-point-functions #'cape-tex)
+    ;; (add-hook 'completion-at-point-functions #'cape-history)
+    ;; ...
+  )
+
+  (use-package tempel
+  :ensure t
+  ;; Require trigger prefix before template name when completing.
+  ;; :custom
+  ;; (tempel-trigger-prefix "<")
+
+  :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
+         ("M-*" . tempel-insert))
+
+  :init
+
+  ;; Setup completion at point
+  (defun tempel-setup-capf ()
+    ;; Add the Tempel Capf to `completion-at-point-functions'.
+    ;; `tempel-expand' only triggers on exact matches. Alternatively use
+    ;; `tempel-complete' if you want to see all matches, but then you
+    ;; should also configure `tempel-trigger-prefix', such that Tempel
+    ;; does not trigger too often when you don't expect it. NOTE: We add
+    ;; `tempel-expand' *before* the main programming mode Capf, such
+    ;; that it will be tried first.
+    (setq-local completion-at-point-functions
+                (cons #'tempel-expand
+                      completion-at-point-functions)))
+
+  (add-hook 'conf-mode-hook 'tempel-setup-capf)
+  (add-hook 'prog-mode-hook 'tempel-setup-capf)
+  (add-hook 'text-mode-hook 'tempel-setup-capf))
+
+  ;; Optionally make the Tempel templates available to Abbrev,
+  ;; either locally or globally. `expand-abbrev' is bound to C-x '.
+  ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
+  ;; (globa
+#+END_SRC
+
+利用 =treesit-auto= 插件优化 =treesit= 体验.
+
+#+BEGIN_SRC emacs-lisp
+
+  (use-package treesit-auto
+    :ensure t
+  :custom
+  (treesit-auto-install 'prompt)
+  :config
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  (global-treesit-auto-mode))
+
+#+END_SRC
+
+Python 配置.
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'python-mode-hook 'eglot-ensure)
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs
+               '(python-mode . ("ruff" "server")))
+  (add-hook 'after-save-hook 'eglot-format))
+#+END_SRC
